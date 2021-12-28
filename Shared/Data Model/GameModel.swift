@@ -24,29 +24,12 @@ struct Item : GameElement, Equatable{
         var f = Item()
         
         f.pos.x = CGFloat.random(in: 15..<within.size.width - 15)
-        f.pos.y = CGFloat.random(in: 15..<within.size.height - 15)
-        
-        return f
-    }
-    
-    static func spawnBomb(within : GeometryProxy) -> Item{
-        var f = Item()
-        
-        f.pos.x = CGFloat.random(in: 0..<within.size.width)
-        f.pos.y -= CGFloat.random(in: 0..<within.size.height)
+        f.pos.y = -CGFloat.random(in: 0..<within.size.height / 2)
         
         return f
     }
     
     static func spawnBullet(pos: CGPoint) -> Item {
-        var f = Item()
-        
-        f.pos = pos
-        
-        return f
-    }
-    
-    static func respawn(pos: CGPoint) -> Item {
         var f = Item()
         
         f.pos = pos
@@ -68,7 +51,6 @@ extension GameElement {
         let r1 = self.radius
         let r2 = to.radius
         
-        // (x2-x1)^2 + (y1-y2)^2 <= (r1+r2)^2
         let distance = pow(p2.x - p1.x, 2) + pow(p1.y - p2.y, 2)
         let minDistance = pow(r1+r2, 2)
         

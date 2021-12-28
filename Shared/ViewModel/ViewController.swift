@@ -23,7 +23,7 @@ struct ViewController: View {
                 GameView()
             }
         }
-        .foregroundColor(.white)
+        .foregroundColor(Color.textColor)
         .onAppear {
             //preferredScreenEdgesDeferringSystemGestures()
         }

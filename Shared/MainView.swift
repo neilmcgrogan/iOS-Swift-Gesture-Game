@@ -16,30 +16,48 @@ struct HomeView: View {
     let data = (1...100).map { "\($0)" }
     
     var body: some View {
-        VStack(alignment: .leading) {
-            Text("Gauntlet")
-                .font(.title)
-                .bold()
-            Text("each level gets more difficult, try and beat all 100 levels to win the game")
+        ZStack {
+            Image("logo")
             
-            Spacer()
-            
-            HStack {
+            VStack(alignment: .center) {
+                Text("swipe")
+                    .font(.largeTitle)
+                    .bold()
+                
+                Text("each level gets harder")
+                    .font(.title3)
+                    .bold()
+                
+                Text("beat all 100 to win the game")
+                    .font(.title3)
+                    .bold()
+                
                 Spacer()
                 
-                Button(action: {
-                    viewRouter.currentPage = .gameView
-                    level.level = 1
-                }) {
-                    Text("Begin")
-                        .font(.largeTitle)
-                        .foregroundColor(.white)
+                HStack {
+                    Spacer()
+                    
+                    Button(action: {
+                        viewRouter.currentPage = .gameView
+                        level.level = 1
+                    }) {
+                        VStack {
+                            Spacer()
+                            
+                            ZStack {
+                                Circle()
+                                    .fill(Color.backgroundColor)
+                                
+                                Image(systemName: "play.fill")
+                                    .font(.largeTitle)
+                                    .foregroundColor(Color.textColor)
+                            }
+                            .frame(width: 100, height: 100, alignment: .bottom)
+                            .shadow(radius: 0.5)
+                        }
+                    }
                 }
-                
-                Spacer()
-            }
-            
-            Spacer()
-        }.padding()
+            }.padding()
+        }
     }
 }

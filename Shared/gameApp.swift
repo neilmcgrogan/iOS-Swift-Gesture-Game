@@ -12,9 +12,7 @@ import UIKit
 struct gameApp: App {
     var body: some Scene {
         WindowGroup {
-            ViewController()
-                .environmentObject(ViewModel())
-                .environmentObject(LevelModel())
+            SplashView()
         }
     }
 }

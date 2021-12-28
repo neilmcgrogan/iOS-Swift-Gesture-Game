@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AD178F0527799AE30056F31C /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD178F0427799AE30056F31C /* SplashView.swift */; };
+		AD178F0627799AE30056F31C /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD178F0427799AE30056F31C /* SplashView.swift */; };
+		AD178F072779A1050056F31C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ADE9E4A8270BFB7F009C338E /* Assets.xcassets */; };
 		AD57CE89273A467E00F848AA /* GameModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD57CE88273A467E00F848AA /* GameModel.swift */; };
 		AD57CE8A273A467E00F848AA /* GameModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD57CE88273A467E00F848AA /* GameModel.swift */; };
 		AD6704E02721026D005B07BD /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD6704DF2721026D005B07BD /* Extensions.swift */; };
@@ -23,16 +26,14 @@
 		AD841EDB27267CEC00731E56 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD841ED927267CEC00731E56 /* MainView.swift */; };
 		AD841EDD27267DB100731E56 /* GameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD841EDC27267DB100731E56 /* GameView.swift */; };
 		AD841EDE27267DB100731E56 /* GameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD841EDC27267DB100731E56 /* GameView.swift */; };
-		ADD09F572775182F009F8A35 /* PhysicalObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADD09F562775182F009F8A35 /* PhysicalObjects.swift */; };
-		ADD09F582775182F009F8A35 /* PhysicalObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADD09F562775182F009F8A35 /* PhysicalObjects.swift */; };
 		ADE9E4CE270BFB7F009C338E /* gameApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADE9E4A6270BFB7E009C338E /* gameApp.swift */; };
 		ADE9E4CF270BFB7F009C338E /* gameApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADE9E4A6270BFB7E009C338E /* gameApp.swift */; };
 		ADE9E4D2270BFB7F009C338E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ADE9E4A8270BFB7F009C338E /* Assets.xcassets */; };
-		ADE9E4D3270BFB7F009C338E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ADE9E4A8270BFB7F009C338E /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		AD054D29276EE13200875748 /* game--iOS--Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "game--iOS--Info.plist"; sourceTree = "<group>"; };
+		AD178F0427799AE30056F31C /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
 		AD57CE88273A467E00F848AA /* GameModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameModel.swift; sourceTree = "<group>"; };
 		AD6704DF2721026D005B07BD /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		AD739A93273859740015195C /* ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModel.swift; sourceTree = "<group>"; };
@@ -41,7 +42,6 @@
 		AD841ED62726756000731E56 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		AD841ED927267CEC00731E56 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		AD841EDC27267DB100731E56 /* GameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameView.swift; sourceTree = "<group>"; };
-		ADD09F562775182F009F8A35 /* PhysicalObjects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhysicalObjects.swift; sourceTree = "<group>"; };
 		ADE9E4A6270BFB7E009C338E /* gameApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = gameApp.swift; sourceTree = "<group>"; };
 		ADE9E4A8270BFB7F009C338E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		ADE9E4AD270BFB7F009C338E /* game.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = game.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -75,8 +75,9 @@
 			isa = PBXGroup;
 			children = (
 				AD841ED62726756000731E56 /* ViewController.swift */,
-				AD739A93273859740015195C /* ViewModel.swift */,
 				AD739A96273859780015195C /* ViewEnum.swift */,
+				AD739A93273859740015195C /* ViewModel.swift */,
+				AD178F0427799AE30056F31C /* SplashView.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -86,7 +87,6 @@
 			children = (
 				AD739A9B273867F20015195C /* Model.swift */,
 				AD6704DF2721026D005B07BD /* Extensions.swift */,
-				ADD09F562775182F009F8A35 /* PhysicalObjects.swift */,
 				AD57CE88273A467E00F848AA /* GameModel.swift */,
 			);
 			path = "Data Model";
@@ -239,7 +239,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ADE9E4D3270BFB7F009C338E /* Assets.xcassets in Resources */,
+				AD178F072779A1050056F31C /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -251,13 +251,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				AD739A9C273867F20015195C /* Model.swift in Sources */,
-				ADD09F572775182F009F8A35 /* PhysicalObjects.swift in Sources */,
 				AD739A97273859780015195C /* ViewEnum.swift in Sources */,
 				AD6704E02721026D005B07BD /* Extensions.swift in Sources */,
 				AD841ED72726756000731E56 /* ViewController.swift in Sources */,
 				AD57CE89273A467E00F848AA /* GameModel.swift in Sources */,
 				AD841EDA27267CEC00731E56 /* MainView.swift in Sources */,
 				AD841EDD27267DB100731E56 /* GameView.swift in Sources */,
+				AD178F0527799AE30056F31C /* SplashView.swift in Sources */,
 				ADE9E4CE270BFB7F009C338E /* gameApp.swift in Sources */,
 				AD739A94273859740015195C /* ViewModel.swift in Sources */,
 			);
@@ -268,13 +268,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				AD739A9D273867F20015195C /* Model.swift in Sources */,
-				ADD09F582775182F009F8A35 /* PhysicalObjects.swift in Sources */,
 				AD739A98273859780015195C /* ViewEnum.swift in Sources */,
 				AD6704E12721026D005B07BD /* Extensions.swift in Sources */,
 				AD841ED82726756000731E56 /* ViewController.swift in Sources */,
 				AD57CE8A273A467E00F848AA /* GameModel.swift in Sources */,
 				AD841EDB27267CEC00731E56 /* MainView.swift in Sources */,
 				AD841EDE27267DB100731E56 /* GameView.swift in Sources */,
+				AD178F0627799AE30056F31C /* SplashView.swift in Sources */,
 				ADE9E4CF270BFB7F009C338E /* gameApp.swift in Sources */,
 				AD739A95273859740015195C /* ViewModel.swift in Sources */,
 			);
@@ -401,12 +401,13 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = Shared/Assets.xcassets;
 				DEVELOPMENT_TEAM = HA6YWKP834;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "game--iOS--Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = swipe;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait;
@@ -433,12 +434,13 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = Shared/Assets.xcassets;
 				DEVELOPMENT_TEAM = HA6YWKP834;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "game--iOS--Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = swipe;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait;
