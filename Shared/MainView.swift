@@ -10,7 +10,9 @@ import SwiftUI
 struct HomeView: View {
     @EnvironmentObject var viewRouter: ViewModel
     @EnvironmentObject var level: LevelModel
+    @EnvironmentObject var defaults: PropertiesModel
     
+    @State private var animationAmount: CGFloat = 1
     @State private var locked = false
     
     let data = (1...100).map { "\($0)" }
@@ -18,6 +20,7 @@ struct HomeView: View {
     var body: some View {
         ZStack {
             Image("logo")
+                .foregroundColor(Color.textColor)
             
             VStack(alignment: .center) {
                 Text("swipe")
@@ -46,14 +49,19 @@ struct HomeView: View {
                             
                             ZStack {
                                 Circle()
-                                    .fill(Color.backgroundColor)
+                                    .fill(Color.playButton)
                                 
                                 Image(systemName: "play.fill")
                                     .font(.largeTitle)
-                                    .foregroundColor(Color.textColor)
+                                    .foregroundColor(Color.topColor)
                             }
-                            .frame(width: 100, height: 100, alignment: .bottom)
+                            .frame(width: CGFloat(defaults.PLAY_BUTTON_SIZE), height: CGFloat(defaults.PLAY_BUTTON_SIZE), alignment: .bottom)
                             .shadow(radius: 0.5)
+                            .scaleEffect(animationAmount)
+                            .animation(.linear(duration: 0.75).delay(0.2).repeatForever(autoreverses: true))
+                            .onAppear {
+                                animationAmount = 1.1
+                            }
                         }
                     }
                 }

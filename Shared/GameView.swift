@@ -7,49 +7,41 @@
 
 import SwiftUI
 
-/*
- 
- GUIDE to coordinates
- 
- 0 < x < 1000
- leading < x < trailing
- 
- 0 < y < 1000
- top < y < bottom
- 
- */
-
 struct GameView: View {
     @EnvironmentObject var viewRouter: ViewModel
     @EnvironmentObject var level: LevelModel
+    @EnvironmentObject var defaults: PropertiesModel
     
     @State var player = Player()
-    
     @State var bullet = [Item]()
     @State var bomb = [Item]()
+    @State var bombAlternate = [Item]()
     @State var point = [Item]()
     
-    @State var elapsedSec = 0.0
-    @State var lastDate = Date()
-    @State var updateTimer = Timer.publish(every: 0.01, on: .current, in: .common).autoconnect()
-    
-    @State private var livesRemaining = 3
     @State private var gameState = 0
-    @State private var timeSince = 1
-    @State private var pointsEarned = 0//UserDefaults.standard.integer(forKey: "pointsEanred")
-    @State private var bombsLeft = 0
-    @State private var bulletSpeed = 0.5
-    @State private var bulletRate = 1
-    @State private var speedCost = 1
-    @State private var rateCost = 1
-    
     let INIT_STATE = 0, PLAYING_STATE = 1, PASSED_STATE = 2, FAILED_STATE = 3
-    let BULLET_COUNT = 20, BULLET_PER_SECOND = 1, COUNT_UPGRADE = 0.15, RATE_UPGRADE = 1
-    let BOMB_FALL_RATE = 0.8
-    //let POINTS_EARNED_KEY = "pointsEanred"
     
     @State var timeRemaining = 3
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    
+    @State var elapsedSec = 0.0
+    @State var lastDate = Date()
+    @State private var timeSince = 1
+    let updateTimer = Timer.publish(every: 0.01, on: .current, in: .common).autoconnect()
+    
+    @State private var livesRemaining = 3
+    @State private var pointsEarned = 0
+    @State private var bulletSpeed = 0.5
+    @State private var bulletRate = 2
+    @State private var speedCost = 1
+    @State private var rateCost = 1
+    
+    @State private var endRoundNow = false
+    
+    @State private var animationAmount: CGFloat = 1
+    
+    @State private var high = 0
+    @State private var low = 0
     
     var body: some View {
         ZStack(alignment: .trailing) {
@@ -57,16 +49,6 @@ struct GameView: View {
                 switch gameState {
                 case INIT_STATE:
                     VStack {
-                        Button("20") {
-                            self.bulletRate += 5
-                            self.bulletSpeed += 3
-                            self.level.level = 20
-                            self.gameState = PLAYING_STATE
-                            spawn(geometry: geometry)
-                            self.bombsLeft = level.bombScale
-                            gameState = PLAYING_STATE
-                        }
-                        
                         Text("\(timeRemaining)")
                             .onReceive(timer) { _ in
                                 if timeRemaining > 0 {
@@ -74,7 +56,6 @@ struct GameView: View {
                                 } else if timeRemaining == 0 {
                                     self.gameState = PLAYING_STATE
                                     spawn(geometry: geometry)
-                                    self.bombsLeft = level.bombScale
                                     gameState = PLAYING_STATE
                                 }
                             }
@@ -122,22 +103,23 @@ struct GameView: View {
                                     .opacity(0.6)
                             }
                             
-                            if self.bomb.count >= 0 {
-                                HStack(spacing: 0) {
-                                    Text("\(self.bombsLeft)")
-                                        .bold()
-                                        .opacity(0.7)
-                                        .foregroundColor(Color.redTextColor)
-                                        .font(.largeTitle)
-                                }
-                            }
-                            
                             ZStack {
+                                ProgressBar()
+                                
                                 // bomb
                                 ForEach(self.bomb, id: \.id) { item in
                                     Circle()
                                         .frame(width: item.radius * 1.6, height: item.radius * 1.6)
                                         .foregroundColor(Color.bomb)
+                                        .cornerRadius(2)
+                                        .position(item.pos)
+                                }
+                                
+                                // bomb alternate
+                                ForEach(self.bombAlternate, id: \.id) { item in
+                                    Circle()
+                                        .frame(width: item.radius * 1.6, height: item.radius * 1.6)
+                                        .foregroundColor(Color.bombAlternate)
                                         .cornerRadius(2)
                                         .position(item.pos)
                                 }
@@ -188,7 +170,7 @@ struct GameView: View {
                             .font(.largeTitle)
                             .bold()
                         
-                        Text("\(level.bombScale) balloons popped")
+                        Text("\(level.BOMB_SPAWN_COUNT) balloons popped")
                             .font(.title)
                         
                         Spacer()
@@ -202,15 +184,14 @@ struct GameView: View {
                         }
                         .foregroundColor(Color.point)
                         
-                        if self.rateCost <= self.pointsEarned {
+                        if self.speedCost <= self.pointsEarned {
                             Button(action: {
-                                self.bulletRate += RATE_UPGRADE
-                                self.pointsEarned -= rateCost
-                                self.rateCost += 1
-                                //UserDefaults.standard.set(self.pointsEarned, forKey: POINTS_EARNED_KEY)
+                                self.bulletSpeed +=  defaults.SPEED_UPGRADE
+                                self.pointsEarned -= speedCost
+                                self.speedCost += 1
                             }) {
                                 HStack {
-                                    Text("dart rate, \(rateCost)")
+                                    Text("speed upgrade, \(speedCost)")
                                         .font(.title)
                                     
                                     Circle().frame(width: player.radius, height: player.radius)
@@ -222,7 +203,38 @@ struct GameView: View {
                             }
                         } else {
                             HStack {
-                                Text("dart rate, \(rateCost)")
+                                Text("speed upgrade, \(speedCost)")
+                                    .foregroundColor(Color.redTextColor)
+                                    .font(.title)
+                                
+                                Circle().frame(width: player.radius, height: player.radius)
+                            }
+                            .padding()
+                            .background(Color.backgroundColor)
+                            .cornerRadius(15)
+                            .shadow(radius: 5)
+                        }
+                        
+                        if self.rateCost <= self.pointsEarned {
+                            Button(action: {
+                                self.bulletRate += Int(defaults.RATE_UPGRADE(level: level.level))
+                                self.pointsEarned -= rateCost
+                                self.rateCost += 1
+                            }) {
+                                HStack {
+                                    Text("reload upgrade, \(rateCost)")
+                                        .font(.title)
+                                    
+                                    Circle().frame(width: player.radius, height: player.radius)
+                                }
+                                .padding()
+                                .background(Color.backgroundColor)
+                                .cornerRadius(15)
+                                .shadow(radius: 5)
+                            }
+                        } else {
+                            HStack {
+                                Text("reload upgrade, \(rateCost)")
                                     .foregroundColor(Color.redTextColor)
                                     .font(.title)
                                 
@@ -233,38 +245,6 @@ struct GameView: View {
                             .cornerRadius(15)
                             .shadow(radius: 5)
                             
-                        }
-                        
-                        if self.speedCost <= self.pointsEarned {
-                            Button(action: {
-                                self.bulletSpeed +=  COUNT_UPGRADE
-                                self.pointsEarned -= speedCost
-                                self.speedCost += 1
-                                //UserDefaults.standard.set(self.pointsEarned, forKey: POINTS_EARNED_KEY)
-                            }) {
-                                HStack {
-                                    Text("dart speed, \(speedCost)")
-                                        .font(.title)
-                                    
-                                    Circle().frame(width: player.radius, height: player.radius)
-                                }
-                                .padding()
-                                .background(Color.backgroundColor)
-                                .cornerRadius(15)
-                                .shadow(radius: 5)
-                            }
-                        } else {
-                            HStack {
-                                Text("dart speed, \(speedCost)")
-                                    .foregroundColor(Color.redTextColor)
-                                    .font(.title)
-                                
-                                Circle().frame(width: player.radius, height: player.radius)
-                            }
-                            .padding()
-                            .background(Color.backgroundColor)
-                            .cornerRadius(15)
-                            .shadow(radius: 5)
                         }
                         
                         HStack {
@@ -276,20 +256,26 @@ struct GameView: View {
                                 level.level += 1
                                 self.spawn(geometry: geometry)
                                 self.gameState = PLAYING_STATE
-                                self.bombsLeft = level.bombScale
                             }) {
                                 VStack {
                                     ZStack {
                                         Circle()
-                                            .fill(Color.backgroundColor)
+                                            .fill(Color.playButton)
                                         
                                         Image(systemName: "play.fill")
                                             .font(.largeTitle)
-                                            .foregroundColor(Color.textColor)
+                                            .foregroundColor(Color.topColor)
                                     }
-                                    .frame(width: 100, height: 100, alignment: .bottom)
                                     .shadow(radius: 0.5)
                                     .font(.title)
+                                }
+                                .frame(width: CGFloat(defaults.PLAY_BUTTON_SIZE), height: CGFloat(defaults.PLAY_BUTTON_SIZE), alignment: .bottom)
+                                .shadow(radius: 0.5)
+                                .foregroundColor(Color.textColor)
+                                .scaleEffect(animationAmount)
+                                .animation(.linear(duration: 0.75).delay(0.2).repeatForever(autoreverses: true))
+                                .onAppear {
+                                    animationAmount = 1.1
                                 }
                             }.frame(width: 100, height: 100, alignment: .bottom)
                         }
@@ -311,13 +297,25 @@ struct GameView: View {
                             level.level += 0
                             viewRouter.currentPage = .homeView
                         }) {
-                            Text("Exit")
-                                .bold()
-                                .frame(width: UIScreen.main.bounds.size.width - 50, height: 100, alignment: .center)
-                                .background(Color.backgroundColor)
-                                .cornerRadius(15)
-                                .shadow(radius: 5)
-                                .font(.title)
+                            HStack {
+                                Spacer()
+                                
+                                ZStack {
+                                    Circle()
+                                        .fill(Color.playButton)
+                                    
+                                    Image(systemName: "chevron.right")
+                                        .font(.largeTitle)
+                                        .foregroundColor(Color.topColor)
+                                }
+                                .frame(width: CGFloat(defaults.PLAY_BUTTON_SIZE), height: CGFloat(defaults.PLAY_BUTTON_SIZE), alignment: .bottom)
+                                .shadow(radius: 0.5)
+                                .scaleEffect(animationAmount)
+                                .animation(.linear(duration: 0.75).delay(0.2).repeatForever(autoreverses: true))
+                                .onAppear {
+                                    animationAmount = 1.1
+                                }
+                            }
                         }
                         .onAppear {
                             endGame()
@@ -338,17 +336,26 @@ struct GameView: View {
     
     func didRecievetimer(geometry: GeometryProxy) {
         self.movePlayer(geometry: geometry)
-        self.checkOutOfBounds(geometry: geometry);
+        self.checkOutOfBounds(geometry: geometry)
         
         if self.livesRemaining < 1 {
             self.endGame()
-        } else if self.bomb.count < 1 {
+        } else if level.bombsLeft == 0 || self.endRoundNow {
             self.endRound()
         } else {
             self.timeSince += 1
-            print(timeSince)
             
-            if timeSince % (120 / bulletRate) == 0 && self.bullet.count < BULLET_COUNT {
+            if timeSince % Int(level.BOMB_ALTERNATE_SPAWN_RATE) == 0 && (level.bombAlternateSpawnsLeft - 1) > 0 {
+                self.bombAlternate.append(.spawn(within: geometry, level: level.level))
+                level.bombAlternateSpawnsLeft -= 1
+            }
+            
+            if timeSince % Int(level.BOMB_SPAWN_RATE) == 0 && (level.bombSpawnsLeft - 1) > 0 {
+                self.bomb.append(.spawn(within: geometry, level: level.level))
+                level.bombSpawnsLeft -= 1
+            }
+            
+            if timeSince % Int(Double(120.0 / Double(bulletRate))) == 0 && self.bullet.count < defaults.BULLET_COUNT {
                 self.bullet.append(.spawnBullet(pos: self.player.pos))
             }
             
@@ -366,12 +373,9 @@ struct GameView: View {
                         self.bullet.removeAll(where: {bulletCollision.contains($0)})
                         
                         self.pointsEarned += bulletCollisionToPoint.count
-                        //UserDefaults.standard.set(self.pointsEarned, forKey: POINTS_EARNED_KEY)
                     }
                 }
             }
-            
-            var index = 0
             
             for bullet in (self.bullet) {
                 for bomb in (self.bomb) {
@@ -380,7 +384,20 @@ struct GameView: View {
                         let bulletCollisionToBomb = self.bomb.filter{ $0.collide(to: bullet)}
                         
                         self.bomb.removeAll(where: {bulletCollisionToBomb.contains($0)})
-                        self.bombsLeft -= bulletCollision.count
+                        level.bombsLeft -= bulletCollision.count
+                        self.bullet.removeAll(where: {bulletCollision.contains($0)})
+                    }
+                }
+            }
+            
+            for bullet in (self.bullet) {
+                for bomb in (self.bombAlternate) {
+                    if bomb.pos.y < (self.player.pos.y - 10) {
+                        let bulletCollision = self.bullet.filter{ $0.collide(to: bomb) }
+                        let bulletCollisionToBomb = self.bombAlternate.filter{ $0.collide(to: bullet)}
+                        
+                        self.bombAlternate.removeAll(where: {bulletCollisionToBomb.contains($0)})
+                        level.bombsLeft -= bulletCollision.count
                         self.bullet.removeAll(where: {bulletCollision.contains($0)})
                     }
                 }
@@ -389,42 +406,21 @@ struct GameView: View {
             var collisions = self.bomb.filter{ $0.collide(to: self.player) }
             self.bomb.removeAll(where: {collisions.contains($0)})
             self.livesRemaining -= collisions.count
-            self.bombsLeft -= collisions.count
+            level.bombsLeft -= collisions.count
+            
+            collisions = self.bombAlternate.filter{ $0.collide(to: self.player) }
+            self.bombAlternate.removeAll(where: {collisions.contains($0)})
+            self.livesRemaining -= collisions.count
+            level.bombsLeft -= collisions.count
             
             collisions = self.point.filter{ $0.collide(to: self.player) }
             self.point.removeAll(where: {collisions.contains($0)})
             self.pointsEarned += collisions.count
             
-            index = 0
+            objectMovement(geometry: geometry)
             
-            for _ in (self.bomb) {
-                if bomb[index].pos.y >= geometry.size.height - 10 {
-                    bomb[index].pos.y = geometry.size.height - 10
-                } else {
-                    bomb[index].pos.y += bombFallRate()
-                }
-                
-                index += 1
-            }
-            
-            index = 0
-            
-            for item in self.bullet {
-                if item.pos.y > 0 {
-                    bullet[index].pos.y -= self.bulletSpeed + 2 + (1 * (item.pos.y / geometry.size.height))
-                    
-                    index += 1
-                } else {
-                    self.bullet.remove(at: index)
-                }
-            }
-            
-            index = 0
-            
-            for _ in self.point {
-                point[index].pos.y += 1
-                
-                index += 1
+            if self.bomb.count == 0 && self.bombAlternate.count == 0 {
+                self.endRoundNow = true
             }
         }
     }
@@ -455,48 +451,106 @@ struct GameView: View {
         }
     }
     
-    func endRound() {
-        self.gameState = PASSED_STATE
-        
+    func removeAll() {
         withAnimation() {
             self.bullet.removeAll()
             self.bomb.removeAll()
+            self.bombAlternate.removeAll()
             self.point.removeAll()
         }
+    }
+    
+    func endRound() {
+        removeAll()
+        self.gameState = PASSED_STATE
     }
     
     func endGame() {
+        removeAll()
         self.gameState = FAILED_STATE
-        
-        withAnimation() {
-            self.bullet.removeAll()
-            self.bomb.removeAll()
-            self.point.removeAll()
-        }
     }
     
     func spawn(geometry: GeometryProxy) {
+        self.endRoundNow = false
+        
         self.player.pos = CGPoint(x: geometry.size.width / 2, y: geometry.size.height / 2)
         self.player.target = self.player.pos
         
-        for _ in 1...level.bombScale {
-            self.bomb.append(.spawn(within: geometry))
+        self.bomb.append(.spawn(within: geometry, level: level.level))
+        self.bombAlternate.append(.spawn(within: geometry, level: level.level))
+        
+        for _ in 1...level.POINT_SPAWN_COUNT {
+            self.point.append(.spawn(within: geometry, level: level.level))
         }
         
-        for _ in 1...level.pointScale {
-            self.point.append(.spawn(within: geometry))
-        }
+        level.bombsLeft = level.BOMB_SPAWN_COUNT + level.BOMB_ALTERNATE_SPAWN_COUNT
+        level.bombSpawnsLeft = level.BOMB_SPAWN_COUNT
+        level.bombAlternateSpawnsLeft = level.BOMB_ALTERNATE_SPAWN_COUNT
     }
     
     func shieldSize() -> CGFloat {
         return CGFloat(self.livesRemaining)
     }
     
-    func progressBar() -> Double {
-        return Double(self.bombsLeft) / Double(level.bombScale)
-    }
-    
-    func bombFallRate() -> Double {
-        return self.BOMB_FALL_RATE + Double((level.level / 30))
+    func objectMovement(geometry: GeometryProxy) {
+        var index = 0
+        
+        for _ in (self.bomb) {
+            if bomb[index].pos.y >= geometry.size.height - 10 {
+                bomb[index].pos.y = geometry.size.height - 10
+            } else {
+                bomb[index].pos.y += level.BOMB_FALL_SPEED
+            }
+            
+            index += 1
+        }
+        
+        index = 0
+        
+        for _ in (self.bombAlternate) {
+            if bombAlternate[index].pos.y >= geometry.size.height - 10 {
+                bombAlternate[index].pos.y = geometry.size.height - 10
+            } else {
+                if bombAlternate[index].pos.x < 0 {
+                    bombAlternate[index].pos.x = 1
+                    bombAlternate[index].lastMovement = 0
+                    bombAlternate[index].pos.x += level.BOMB_ALTERNATE_FALL_SPEED_X
+                } else if bombAlternate[index].pos.x > geometry.size.width {
+                    bombAlternate[index].pos.x = geometry.size.width - 1
+                    bombAlternate[index].lastMovement = 1
+                    bombAlternate[index].pos.x -= level.BOMB_ALTERNATE_FALL_SPEED_X
+                } else {
+                    if bombAlternate[index].lastMovement == 0 {
+                        bombAlternate[index].pos.x += level.BOMB_ALTERNATE_FALL_SPEED_X
+                    } else{
+                        bombAlternate[index].pos.x -= level.BOMB_ALTERNATE_FALL_SPEED_X
+                    }
+                }
+                
+                bombAlternate[index].pos.y += level.BOMB_ALTERNATE_FALL_SPEED_Y
+            }
+            
+            index += 1
+        }
+        
+        index = 0
+        
+        for item in self.bullet {
+            if item.pos.y > 0 {
+                bullet[index].pos.y -= (Double(level.BULLET_SPEED_INIT) + self.bulletSpeed)
+                
+                index += 1
+            } else {
+                self.bullet.remove(at: index)
+            }
+        }
+        
+        index = 0
+        
+        for _ in self.point {
+            point[index].pos.y += level.POINT_FALL_SPEED
+            
+            index += 1
+        }
     }
 }

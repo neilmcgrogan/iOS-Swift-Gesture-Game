@@ -19,12 +19,22 @@ struct Item : GameElement, Equatable{
     var id = UUID()
     var pos = CGPoint(x:0,y:0)
     var radius = CGFloat(12.0)
+    var lastMovement = CGFloat.random(in: 0...1)
     
-    static func spawn(within : GeometryProxy) -> Item{
+    static func spawn(within : GeometryProxy, level: Int) -> Item{
         var f = Item()
         
         f.pos.x = CGFloat.random(in: 15..<within.size.width - 15)
-        f.pos.y = -CGFloat.random(in: 0..<within.size.height / 2)
+        f.pos.y = -CGFloat.random(in: 0..<(1 + (within.size.height / 2) * Double(level / 10)))
+        
+        return f
+    }
+    
+    static func spawnBomb(within : GeometryProxy) -> Item {
+        var f = Item()
+        
+        f.pos.x = CGFloat.random(in: 5..<within.size.width - 5)
+        f.pos.y = -CGFloat.random(in: 10..<20)
         
         return f
     }

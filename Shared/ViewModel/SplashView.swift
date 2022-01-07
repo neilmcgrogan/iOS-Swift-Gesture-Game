@@ -34,6 +34,7 @@ struct SplashView: View {
             ViewController()
                 .environmentObject(ViewModel())
                 .environmentObject(LevelModel())
+                .environmentObject(PropertiesModel())
         }
     }
     
